@@ -30,14 +30,14 @@ class _ChatScreenState extends State<ChatScreen> {
     socket.on('message', (data) {
       if (data['rec'] == widget.usrph &&
           data['sen'] == widget.contact['phoneNo']) {
-        Timer(Duration(seconds: 3), () => setState(() {}));
+        Timer(Duration(seconds: 2), () => setState(() {_controller.jumpTo(_controller.position.maxScrollExtent);}));
       }
     });
 
     socket.on('refresh', (data) {
       if (data['rec'] == widget.contact['phoneNo'] &&
           data['sen'] == widget.usrph) {
-        Timer(Duration(seconds: 3), () => setState(() {}));
+        Timer(Duration(seconds: 2), () => setState(() {_controller.jumpTo(_controller.position.maxScrollExtent);}));
       }
     });
   }
@@ -103,6 +103,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       if (snap.hasData) {
                         // messages = snap.data;
                         return ListView.builder(
+                          reverse: true,
                           controller: _controller,
                           itemCount: snap.data.length,
                           itemBuilder: (context, index) {

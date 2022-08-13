@@ -14,16 +14,19 @@ class ContactsPage extends StatefulWidget {
 }
 
 class _ContactsPageState extends State<ContactsPage> {
-  // BackendService backendService=BackendService();
+  BackendService backendService=BackendService();
   // late Socket socket;
   // late List<Map<String,dynamic>> contacts=[];
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    // socket=backendService.initSocket();
-    // contacts=backendService.getUsers();
-    // socket.on('refresh', (data) => {});
+  }
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    backendService.closeStore();
   }
   @override
   Widget build(BuildContext context) {
@@ -71,7 +74,7 @@ class _ContactsPageState extends State<ContactsPage> {
                 child: Container(
               color: Color.fromRGBO(10, 26, 35, 1),
               child: StreamBuilder(
-                stream: BackendService().getUsers(),
+                stream: backendService.getUsers(),
                 builder: (context,AsyncSnapshot snap){
                   if(snap.hasData){
                     return ListView.builder(
@@ -81,7 +84,7 @@ class _ContactsPageState extends State<ContactsPage> {
                     });
                   }
                   else {
-                    return Center(child: CircularProgressIndicator(),);
+                    return Center();
                   }
                 },
               ),

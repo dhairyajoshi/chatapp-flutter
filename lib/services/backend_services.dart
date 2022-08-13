@@ -65,15 +65,13 @@ class BackendService {
     for (int i = 0; i < messages.length; i++) {
       data.add(messages[i].toJson());
     }
-
+    data = List.from(data.reversed);
     yield data;
 
     final response = await http.post(Uri.parse('$baseUrl/messages/get'),
         body: {'c1': c1, 'c2': c2},
         headers: {'Authorization': 'Bearer $token'});
-    if (response.statusCode >= 400) {
-      yield data;
-    } else if (response.statusCode == 200) {
+    if (response.statusCode == 200) {
       final tdata = json.decode(response.body);
       if (tdata.length != data.length) {
         for (int i = 0; i < messages.length; i++) {
@@ -85,6 +83,7 @@ class BackendService {
           messagebox.put(MessageModel(
               c2, tdata[i]['message'], tdata[i]['time'], tdata[i]['sender']));
         }
+        data = List.from(data.reversed);
         yield data;
       }
     } else {
@@ -97,7 +96,7 @@ class BackendService {
     store.close();
   }
 
-  getUsers() async* {
+  Stream<List<Map<String, dynamic>>> getUsers() async* {
     store = await openStore();
     final contactbox = store.box<ContactModel>();
     List<ContactModel> contacts = contactbox.getAll();
@@ -121,13 +120,14 @@ class BackendService {
         data = [];
         for (int i = 0; i < tdata.length; i++) {
           data.add(tdata[i]);
-          contactbox.put(ContactModel(tdata['phoneNo'], tdata['name'], ''));
+          contactbox
+              .put(ContactModel(tdata[i]['phoneNo'], tdata[i]['name'], ' '));
         }
         yield data;
       }
     }
 
-    yield <Map<String, dynamic>>[];
+    store.close();
   }
 
   Future<bool> loginUser(String name, String ph) async {
