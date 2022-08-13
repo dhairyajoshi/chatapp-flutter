@@ -36,9 +36,38 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "2:3905768109741648151",
+      "lastPropertyId": "4:4850275323730245530",
+      "name": "ContactModel",
+      "properties": [
+        {
+          "id": "1:4659609785094347177",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:9159424368064994965",
+          "name": "number",
+          "type": 9
+        },
+        {
+          "id": "3:1596993606953204520",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "4:4850275323730245530",
+          "name": "pfp",
+          "type": 9
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "1:6865457208779376139",
+  "lastEntityId": "2:3905768109741648151",
   "lastIndexId": "0:0",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",

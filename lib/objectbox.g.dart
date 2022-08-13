@@ -13,6 +13,7 @@ import 'package:objectbox/internal.dart'; // generated code can access "internal
 import 'package:objectbox/objectbox.dart';
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
+import 'models/contact.dart';
 import 'models/message.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
@@ -51,6 +52,35 @@ final _entities = <ModelEntity>[
             flags: 0)
       ],
       relations: <ModelRelation>[],
+      backlinks: <ModelBacklink>[]),
+  ModelEntity(
+      id: const IdUid(2, 3905768109741648151),
+      name: 'ContactModel',
+      lastPropertyId: const IdUid(4, 4850275323730245530),
+      flags: 0,
+      properties: <ModelProperty>[
+        ModelProperty(
+            id: const IdUid(1, 4659609785094347177),
+            name: 'id',
+            type: 6,
+            flags: 1),
+        ModelProperty(
+            id: const IdUid(2, 9159424368064994965),
+            name: 'number',
+            type: 9,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(3, 1596993606953204520),
+            name: 'name',
+            type: 9,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(4, 4850275323730245530),
+            name: 'pfp',
+            type: 9,
+            flags: 0)
+      ],
+      relations: <ModelRelation>[],
       backlinks: <ModelBacklink>[])
 ];
 
@@ -74,7 +104,7 @@ Future<Store> openStore(
 ModelDefinition getObjectBoxModel() {
   final model = ModelInfo(
       entities: _entities,
-      lastEntityId: const IdUid(1, 6865457208779376139),
+      lastEntityId: const IdUid(2, 3905768109741648151),
       lastIndexId: const IdUid(0, 0),
       lastRelationId: const IdUid(0, 0),
       lastSequenceId: const IdUid(0, 0),
@@ -125,6 +155,41 @@ ModelDefinition getObjectBoxModel() {
               id: const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0));
 
           return object;
+        }),
+    ContactModel: EntityDefinition<ContactModel>(
+        model: _entities[1],
+        toOneRelations: (ContactModel object) => [],
+        toManyRelations: (ContactModel object) => {},
+        getId: (ContactModel object) => object.id,
+        setId: (ContactModel object, int id) {
+          object.id = id;
+        },
+        objectToFB: (ContactModel object, fb.Builder fbb) {
+          final numberOffset = fbb.writeString(object.number);
+          final nameOffset = fbb.writeString(object.name);
+          final pfpOffset = fbb.writeString(object.pfp);
+          fbb.startTable(5);
+          fbb.addInt64(0, object.id);
+          fbb.addOffset(1, numberOffset);
+          fbb.addOffset(2, nameOffset);
+          fbb.addOffset(3, pfpOffset);
+          fbb.finish(fbb.endTable());
+          return object.id;
+        },
+        objectFromFB: (Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+
+          final object = ContactModel(
+              const fb.StringReader(asciiOptimization: true)
+                  .vTableGet(buffer, rootOffset, 6, ''),
+              const fb.StringReader(asciiOptimization: true)
+                  .vTableGet(buffer, rootOffset, 8, ''),
+              const fb.StringReader(asciiOptimization: true)
+                  .vTableGet(buffer, rootOffset, 10, ''),
+              id: const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0));
+
+          return object;
         })
   };
 
@@ -152,4 +217,23 @@ class MessageModel_ {
   /// see [MessageModel.sentBy]
   static final sentBy =
       QueryStringProperty<MessageModel>(_entities[0].properties[4]);
+}
+
+/// [ContactModel] entity fields to define ObjectBox queries.
+class ContactModel_ {
+  /// see [ContactModel.id]
+  static final id =
+      QueryIntegerProperty<ContactModel>(_entities[1].properties[0]);
+
+  /// see [ContactModel.number]
+  static final number =
+      QueryStringProperty<ContactModel>(_entities[1].properties[1]);
+
+  /// see [ContactModel.name]
+  static final name =
+      QueryStringProperty<ContactModel>(_entities[1].properties[2]);
+
+  /// see [ContactModel.pfp]
+  static final pfp =
+      QueryStringProperty<ContactModel>(_entities[1].properties[3]);
 }

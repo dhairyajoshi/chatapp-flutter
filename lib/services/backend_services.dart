@@ -1,4 +1,5 @@
 import 'package:chatapp/environment.dart';
+import 'package:chatapp/models/contact.dart';
 import 'package:chatapp/models/message.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,9 +35,9 @@ class BackendService {
   }
 
   sendMessage(Socket socket, String rec, String msg) async {
-    if(!store.isClosed()) {
+    if (!store.isClosed()) {
       store.close();
-    } 
+    }
     final pref = await SharedPreferences.getInstance();
     String sen = pref.getString('phoneNo')!;
     String token = pref.getString('token')!;
@@ -70,8 +71,9 @@ class BackendService {
     final response = await http.post(Uri.parse('$baseUrl/messages/get'),
         body: {'c1': c1, 'c2': c2},
         headers: {'Authorization': 'Bearer $token'});
-
-    if (response.statusCode == 200) {
+    if (response.statusCode >= 400) {
+      yield data;
+    } else if (response.statusCode == 200) {
       final tdata = json.decode(response.body);
       if (tdata.length != data.length) {
         for (int i = 0; i < messages.length; i++) {
@@ -91,21 +93,41 @@ class BackendService {
     store.close();
   }
 
-  closeStore(){
+  closeStore() {
     store.close();
   }
 
-  getUsers() async {
+  getUsers() async* {
+    store = await openStore();
+    final contactbox = store.box<ContactModel>();
+    List<ContactModel> contacts = contactbox.getAll();
+    List<Map<String, dynamic>> data = [];
+
+    for (int i = 0; i < contacts.length; i++) {
+      data.add(contacts[i].toJson());
+    }
+    yield data;
+
     final pref = await SharedPreferences.getInstance();
     final token = pref.getString('token');
-    // print(token);
     final response = await http.get(Uri.parse('$baseUrl/user'),
         headers: {'Authorization': 'Bearer $token'});
     if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      return data;
+      final tdata = json.decode(response.body);
+      if (tdata.length != data.length) {
+        for (int i = 0; i < contacts.length; i++) {
+          contactbox.remove(contacts[i].id);
+        }
+        data = [];
+        for (int i = 0; i < tdata.length; i++) {
+          data.add(tdata[i]);
+          contactbox.put(ContactModel(tdata['phoneNo'], tdata['name'], ''));
+        }
+        yield data;
+      }
     }
-    return <Map<String, dynamic>>[];
+
+    yield <Map<String, dynamic>>[];
   }
 
   Future<bool> loginUser(String name, String ph) async {

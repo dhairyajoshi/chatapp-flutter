@@ -70,8 +70,8 @@ class _ContactsPageState extends State<ContactsPage> {
             Flexible(
                 child: Container(
               color: Color.fromRGBO(10, 26, 35, 1),
-              child: FutureBuilder(
-                future: BackendService().getUsers(),
+              child: StreamBuilder(
+                stream: BackendService().getUsers(),
                 builder: (context,AsyncSnapshot snap){
                   if(snap.hasData){
                     return ListView.builder(
