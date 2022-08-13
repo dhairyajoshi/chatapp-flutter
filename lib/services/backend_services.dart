@@ -1,14 +1,17 @@
 import 'package:chatapp/environment.dart';
+import 'package:chatapp/models/message.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:socket_io_client/socket_io_client.dart';
 import 'package:intl/intl.dart';
+import 'package:chatapp/objectbox.g.dart';
 
 class BackendService {
   String baseUrl = Variables.baseUrl;
   static final BackendService _backendService = BackendService._internal();
   late Socket socket;
+  late Store store;
   late SharedPreferences pref;
 
   factory BackendService() {
@@ -18,49 +21,78 @@ class BackendService {
   BackendService._internal();
 
   Socket initSocket() {
-    socket=io(baseUrl, <String, dynamic>{
+    socket = io(baseUrl, <String, dynamic>{
       'transports': ['websocket'],
-      'autoConnect': false, 
+      'autoConnect': false,
     });
     socket.connect();
-    
     return socket;
   }
 
-  disconnectSocket(){
+  disconnectSocket() {
     socket.disconnect();
   }
 
   sendMessage(Socket socket, String rec, String msg) async {
+    if(!store.isClosed()) {
+      store.close();
+    } 
     final pref = await SharedPreferences.getInstance();
     String sen = pref.getString('phoneNo')!;
     String token = pref.getString('token')!;
-    String time=DateFormat('HH:mm').format(DateTime.now()).toString();
-    socket.emit('message', {
-      'message': msg,
+    String time = DateFormat('HH:mm').format(DateTime.now()).toString();
+    socket.emit(
+        'message', {'message': msg, 'rec': rec, 'sen': sen, 'time': time});
+    http.post(Uri.parse('$baseUrl/messages/send'),
+        body: {'receiver': rec, 'sender': sen, 'message': msg, 'time': time},
+        headers: {'Authorization': 'Bearer $token'});
+    socket.emit('refresh', {
       'rec': rec,
       'sen': sen,
-      'time': time
     });
-    http.post(Uri.parse('$baseUrl/messages/send'),body: {'receiver':rec,'sender':sen,'message':msg,'time':time},headers: {'Authorization':'Bearer $token'}); 
   }
 
-  Future<List<Map<String,dynamic>>> getMessages(String c2)async{
+  Stream<List<Map<String, dynamic>>> getMessages(String c2) async* {
+    store = await openStore();
+    final messagebox = store.box<MessageModel>();
+    List<MessageModel> messages =
+        messagebox.query(MessageModel_.contact.equals(c2)).build().find();
     final pref = await SharedPreferences.getInstance();
     String c1 = pref.getString('phoneNo')!;
     String token = pref.getString('token')!;
-    List<Map<String,dynamic>> data=[]; 
-    final response= await http.post(Uri.parse('$baseUrl/messages/get'),body: {'c1':c1,'c2':c2},headers: {'Authorization':'Bearer $token'});
-
-    if(response.statusCode==200){
-      final tdata =json.decode(response.body);
-      for(int i=0;i<tdata.length;i++)
-      {
-        data.add(tdata[i]);
-      }
-      return data;
+    List<Map<String, dynamic>> data = [];
+    for (int i = 0; i < messages.length; i++) {
+      data.add(messages[i].toJson());
     }
-    return [];
+
+    yield data;
+
+    final response = await http.post(Uri.parse('$baseUrl/messages/get'),
+        body: {'c1': c1, 'c2': c2},
+        headers: {'Authorization': 'Bearer $token'});
+
+    if (response.statusCode == 200) {
+      final tdata = json.decode(response.body);
+      if (tdata.length != data.length) {
+        for (int i = 0; i < messages.length; i++) {
+          messagebox.remove(messages[i].id);
+        }
+        data = [];
+        for (int i = 0; i < tdata.length; i++) {
+          data.add(tdata[i]);
+          messagebox.put(MessageModel(
+              c2, tdata[i]['message'], tdata[i]['time'], tdata[i]['sender']));
+        }
+        yield data;
+      }
+    } else {
+      yield [];
+    }
+    store.close();
+  }
+
+  closeStore(){
+    store.close();
   }
 
   getUsers() async {

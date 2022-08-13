@@ -3,6 +3,7 @@ import 'package:chatapp/services/backend_services.dart';
 import 'package:flutter/material.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 import 'package:intl/intl.dart';
+import 'dart:async';
 
 class ChatScreen extends StatefulWidget {
   Map<String, dynamic> contact;
@@ -29,9 +30,14 @@ class _ChatScreenState extends State<ChatScreen> {
     socket.on('message', (data) {
       if (data['rec'] == widget.usrph &&
           data['sen'] == widget.contact['phoneNo']) {
-        setState(() {
-          messages.add({'message': data['message'], 'sent': 1, 'time': data['time']});
-        });
+        Timer(Duration(seconds: 3), () => setState(() {}));
+      }
+    });
+
+    socket.on('refresh', (data) {
+      if (data['rec'] == widget.contact['phoneNo'] &&
+          data['sen'] == widget.usrph) {
+        Timer(Duration(seconds: 3), () => setState(() {}));
       }
     });
   }
@@ -41,6 +47,7 @@ class _ChatScreenState extends State<ChatScreen> {
     super.dispose();
     backendService.disconnectSocket();
     socket.dispose();
+    backendService.closeStore();
     myController.dispose();
     _controller.dispose();
   }
@@ -89,19 +96,19 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: Container(
                   padding: EdgeInsets.only(top: 10, left: 5, right: 5),
                   color: Color.fromRGBO(10, 26, 35, 1),
-                  child: FutureBuilder(
-                    future:
+                  child: StreamBuilder(
+                    stream:
                         backendService.getMessages(widget.contact['phoneNo']),
                     builder: (context, AsyncSnapshot snap) {
                       if (snap.hasData) {
-                        messages = snap.data;
+                        // messages = snap.data;
                         return ListView.builder(
                           controller: _controller,
-                          itemCount: messages.length,
+                          itemCount: snap.data.length,
                           itemBuilder: (context, index) {
                             return Row(
                               mainAxisAlignment:
-                                  messages[index]['sender'] != widget.usrph
+                                  snap.data[index]['sender'] != widget.usrph
                                       ? MainAxisAlignment.start
                                       : MainAxisAlignment.end,
                               children: [
@@ -115,11 +122,11 @@ class _ChatScreenState extends State<ChatScreen> {
                                         horizontal: 5, vertical: 5),
                                     // padding: EdgeInsets.symmetric(horizontal: 10,vertical: 10),
                                     decoration: BoxDecoration(
-                                        color: messages[index]['sender'] !=
+                                        color: snap.data[index]['sender'] !=
                                                 widget.usrph
                                             ? Color.fromRGBO(34, 47, 54, 1)
                                             : Color.fromRGBO(4, 71, 64, 1),
-                                        borderRadius: messages[index]
+                                        borderRadius: snap.data[index]
                                                     ['sender'] !=
                                                 widget.usrph
                                             ? BorderRadius.only(
@@ -139,7 +146,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                             CrossAxisAlignment.end,
                                         children: [
                                           Text(
-                                            messages[index]['message'],
+                                            snap.data[index]['message'],
                                             style: TextStyle(
                                                 fontSize: 17,
                                                 color: Colors.white),
@@ -148,7 +155,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                             height: 2,
                                           ),
                                           Text(
-                                            messages[index]['time'],
+                                            snap.data[index]['time'],
                                             style: TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 10),
@@ -163,6 +170,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           },
                         );
                       }
+                      // print(snap.error);
                       return Center(
                         child: CircularProgressIndicator(),
                       );
@@ -200,11 +208,6 @@ class _ChatScreenState extends State<ChatScreen> {
                               socket, widget.contact['phoneNo'], msg);
 
                           setState(() {
-                            messages.add({
-                              'message': msg,
-                              'sender': widget.usrph,
-                              'time': DateFormat('HH:mm').format(now).toString()
-                            });
                             myController.text = "";
                             _controller
                                 .jumpTo(_controller.position.maxScrollExtent);
