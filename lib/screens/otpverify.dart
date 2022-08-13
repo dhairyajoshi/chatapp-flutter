@@ -11,7 +11,8 @@ import 'package:flutter/src/widgets/framework.dart';
 class OtpPage extends StatefulWidget {
   String ph;
   String verificationId;
-  OtpPage({Key? key, required this.verificationId,required this.ph}) : super(key: key);
+  String otp;
+  OtpPage({Key? key, required this.verificationId,required this.ph,this.otp=''}) : super(key: key);
 
   @override
   State<OtpPage> createState() => _OtpPageState();
@@ -20,6 +21,13 @@ class OtpPage extends StatefulWidget {
 class _OtpPageState extends State<OtpPage> {
   TextEditingController otpController = TextEditingController();
   TextEditingController nameController = TextEditingController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    otpController.text=widget.otp;
+  }
 
   @override
   void dispose() {
@@ -55,8 +63,9 @@ class _OtpPageState extends State<OtpPage> {
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Enter OTP',
-                    
+                      
                   ),
+                  
                   keyboardType: TextInputType.number,
                 ),
               ),

@@ -30,14 +30,14 @@ class _ChatScreenState extends State<ChatScreen> {
     socket.on('message', (data) {
       if (data['rec'] == widget.usrph &&
           data['sen'] == widget.contact['phoneNo']) {
-        Timer(Duration(seconds: 2), () => setState(() {_controller.jumpTo(_controller.position.maxScrollExtent);}));
+        Timer(Duration(seconds: 2), () => setState(() {}));
       }
     });
 
     socket.on('refresh', (data) {
       if (data['rec'] == widget.contact['phoneNo'] &&
           data['sen'] == widget.usrph) {
-        Timer(Duration(seconds: 2), () => setState(() {_controller.jumpTo(_controller.position.maxScrollExtent);}));
+        Timer(Duration(seconds: 2), () => setState(() {}));
       }
     });
   }

@@ -13,10 +13,11 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   TextEditingController phoneController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  String _verificationId='';
 
   @override
   void dispose() {
-    super.dispose(); 
+    super.dispose();
     phoneController.dispose();
     passwordController.dispose();
   }
@@ -61,12 +62,12 @@ class _LoginPageState extends State<LoginPage> {
                         await auth.verifyPhoneNumber(
                             phoneNumber: '+91${phoneController.text.trim()}',
                             verificationCompleted:
-                                (PhoneAuthCredential credential) async {
-                              final user =
-                                  await auth.signInWithCredential(credential);
-
-                              print('signed in');
-                            },
+                                (PhoneAuthCredential credential) {
+                              
+                                  Navigator.push(context, 
+                                  MaterialPageRoute(builder: (context) => OtpPage(verificationId: _verificationId, ph:phoneController.text.trim(),otp: credential.smsCode.toString(),))
+                                  );
+                                },
                             verificationFailed: (FirebaseAuthException e) {
                               if (e.code == 'invalid-phone-number') {
                                 print(
@@ -76,17 +77,19 @@ class _LoginPageState extends State<LoginPage> {
                             },
                             codeSent: (String verificationId,
                                 int? resendToken) async {
+                                  _verificationId=verificationId;
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => OtpPage(
-                                          verificationId: verificationId
-                                          ,ph: phoneController.text.trim(),)));
+                                            verificationId: _verificationId,
+                                            ph: phoneController.text.trim(),
+                                          )));
                             },
                             codeAutoRetrievalTimeout: (String verificationId) {
                               // Auto-resolution timed out...
                             },
-                            timeout: Duration(seconds: 120)); 
+                            timeout: Duration(seconds: 120));
                       },
                     )),
               ],
