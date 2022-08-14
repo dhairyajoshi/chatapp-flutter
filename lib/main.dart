@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
         builder:(context,AsyncSnapshot snap){
           if(snap.hasData){
             if(snap.data['status']==true){
-              return ContactsPage(usrph: snap.data['usrph']);
+              return ContactsPage();
             }
             return LoginPage();
           }

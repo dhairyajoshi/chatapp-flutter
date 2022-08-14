@@ -1,12 +1,8 @@
 // ignore_for_file: use_build_context_synchronously, prefer_const_constructors
-
 import 'package:chatapp/screens/contacts.dart';
 import 'package:chatapp/services/backend_services.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
 class OtpPage extends StatefulWidget {
   String ph;
@@ -91,7 +87,7 @@ class _OtpPageState extends State<OtpPage> {
                             Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => ContactsPage(usrph:widget.ph)),
+                                  builder: (context) => ContactsPage()),
                               (Route<dynamic> route) => false);
                           }
                           else{

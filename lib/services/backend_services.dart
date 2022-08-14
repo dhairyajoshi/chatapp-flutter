@@ -34,100 +34,60 @@ class BackendService {
     socket.disconnect();
   }
 
-  sendMessage(Socket socket, String rec, String msg) async {
-    if (!store.isClosed()) {
-      store.close();
-    }
+  sendMessage(String rec, String msg) async {
+
     final pref = await SharedPreferences.getInstance();
     String sen = pref.getString('phoneNo')!;
     String token = pref.getString('token')!;
     String time = DateFormat('HH:mm').format(DateTime.now()).toString();
-    socket.emit(
-        'message', {'message': msg, 'rec': rec, 'sen': sen, 'time': time});
     http.post(Uri.parse('$baseUrl/messages/send'),
         body: {'receiver': rec, 'sender': sen, 'message': msg, 'time': time},
         headers: {'Authorization': 'Bearer $token'});
-    socket.emit('refresh', {
-      'rec': rec,
-      'sen': sen,
-    });
+
   }
 
-  Stream<List<Map<String, dynamic>>> getMessages(String c2) async* {
-    store = await openStore();
-    final messagebox = store.box<MessageModel>();
-    List<MessageModel> messages =
-        messagebox.query(MessageModel_.contact.equals(c2)).build().find();
+  Future<List<Map<String, dynamic>>> getMessages(String c2) async {
     final pref = await SharedPreferences.getInstance();
     String c1 = pref.getString('phoneNo')!;
     String token = pref.getString('token')!;
-    List<Map<String, dynamic>> data = [];
-    for (int i = 0; i < messages.length; i++) {
-      data.add(messages[i].toJson());
-    }
-    data = List.from(data.reversed);
-    yield data;
+    List<Map<String, dynamic>> data=[];
 
     final response = await http.post(Uri.parse('$baseUrl/messages/get'),
         body: {'c1': c1, 'c2': c2},
         headers: {'Authorization': 'Bearer $token'});
     if (response.statusCode == 200) {
       final tdata = json.decode(response.body);
-      if (tdata.length != data.length) {
-        for (int i = 0; i < messages.length; i++) {
-          messagebox.remove(messages[i].id);
-        }
-        data = [];
-        for (int i = 0; i < tdata.length; i++) {
-          data.add(tdata[i]);
-          messagebox.put(MessageModel(
-              c2, tdata[i]['message'], tdata[i]['time'], tdata[i]['sender']));
-        }
-        data = List.from(data.reversed);
-        yield data;
-      }
-    } else {
-      yield [];
+      for(int i=0;i<tdata.length;i++)
+      data.add(tdata[i]);
+
+      return data;
     }
+
+    return [];
+  }
+
+  closeStore(){
     store.close();
   }
 
-  closeStore() {
-    store.close();
-  }
-
-  Stream<List<Map<String, dynamic>>> getUsers() async* {
-    store = await openStore();
-    final contactbox = store.box<ContactModel>();
-    List<ContactModel> contacts = contactbox.getAll();
-    List<Map<String, dynamic>> data = [];
-
-    for (int i = 0; i < contacts.length; i++) {
-      data.add(contacts[i].toJson());
-    }
-    yield data;
+  Future<List<Map<String, dynamic>>> getUsers() async {
+    
 
     final pref = await SharedPreferences.getInstance();
     final token = pref.getString('token');
     final response = await http.get(Uri.parse('$baseUrl/user'),
         headers: {'Authorization': 'Bearer $token'});
+    List<Map<String,dynamic>> data=[];
     if (response.statusCode == 200) {
-      final tdata = json.decode(response.body);
-      if (tdata.length != data.length) {
-        for (int i = 0; i < contacts.length; i++) {
-          contactbox.remove(contacts[i].id);
-        }
-        data = [];
+        final tdata=json.decode(response.body);
+        
         for (int i = 0; i < tdata.length; i++) {
           data.add(tdata[i]);
-          contactbox
-              .put(ContactModel(tdata[i]['phoneNo'], tdata[i]['name'], ' '));
         }
-        yield data;
+        return data;
       }
-    }
-
-    store.close();
+    
+    return [];
   }
 
   Future<bool> loginUser(String name, String ph) async {
