@@ -112,10 +112,9 @@ class ChatBloc extends Bloc<AppEvent, AppState> {
         Store store= await openStore();
         final messages=store.box<MessageModel>();
         messages.put(MessageModel(contact,message,time,usr));
-        backendService.sendMessage(contact, message);
+        await backendService.sendMessage(contact, message);
         store.close();
         textControl.text="";
-        // scrlcont.jumpTo(scrlcont.position.maxScrollExtent);
         add(FetchChatEvent(contact));
       }
     },);
