@@ -67,13 +67,12 @@ class BackendService {
     store.close();
   }
 
-  Future<List<Map<String, dynamic>>> getUsers() async {
+  Future<List<Map<String, dynamic>>> getUsers(List<String> contacts) async {
     
-
     final pref = await SharedPreferences.getInstance();
     final token = pref.getString('token');
-    final response = await http.get(Uri.parse('$baseUrl/user'),
-        headers: {'Authorization': 'Bearer $token'});
+    final response = await http.post(Uri.parse('$baseUrl/user/get'),
+        headers: {'Authorization': 'Bearer $token','content-type': 'application/json'},body: jsonEncode({'users':contacts}));
     List<Map<String,dynamic>> data=[];
     if (response.statusCode == 200) {
         final tdata=json.decode(response.body);
