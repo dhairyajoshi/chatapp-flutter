@@ -1,12 +1,11 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sized_box_for_whitespace
 
-import 'package:chatapp/bloc/appbloc.dart';
-import 'package:chatapp/bloc/contactbloc.dart';
-import 'package:chatapp/screens/chatscreen.dart';
-import 'package:chatapp/services/backend_services.dart';
+import '../bloc/appbloc.dart';
+import '../bloc/contactbloc.dart';
+import '../screens/chatscreen.dart';
+import '../services/backend_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:socket_io_client/socket_io_client.dart';
 
 
 

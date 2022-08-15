@@ -9,7 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:chatapp/objectbox.g.dart';
 
 class BackendService {
-  String baseUrl = Variables.baseUrl;
+  String baseUrl = 'https://whatsapp-backnd.herokuapp.com';
   static final BackendService _backendService = BackendService._internal();
   late Socket socket;
   late Store store;
