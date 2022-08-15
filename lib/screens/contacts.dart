@@ -1,6 +1,6 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sized_box_for_whitespace
 
-import '../bloc/appbloc.dart';
+import '../bloc/AppBloc.dart';
 import '../bloc/contactbloc.dart';
 import '../screens/chatscreen.dart';
 import '../services/backend_services.dart';

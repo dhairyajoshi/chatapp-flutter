@@ -1,4 +1,4 @@
-import '../bloc/appbloc.dart';
+import 'AppBloc.dart';
 import '../objectbox.g.dart';
 import '../services/backend_services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
