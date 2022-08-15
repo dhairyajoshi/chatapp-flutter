@@ -6,7 +6,7 @@ name: "Build and release"
 jobs:
   build:
     name: "Build and release"
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - uses: dart-lang/setup-dart@v1.3
@@ -20,7 +20,6 @@ jobs:
           
       - run: flutter pub get
       - run: flutter build apk
-      - run: flutter build ios
       - name: Push to Releases
         uses: ncipollo/release-action@v1
         with:
