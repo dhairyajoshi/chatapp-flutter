@@ -60,7 +60,6 @@ class ChatBloc extends Bloc<AppEvent, AppState> {
         }));
     on<FetchChatEvent>(
       (event, emit) async {
-        
         store = await openStore();
         final messagebox = store.box<MessageModel>();
         contact = event.c2;
@@ -78,7 +77,7 @@ class ChatBloc extends Bloc<AppEvent, AppState> {
         List<Map<String, dynamic>> newdata =
             await backendService.getMessages(event.c2);
 
-        if (newdata != data) {
+        if (newdata.length > data.length) {
           texts=newdata;
           emit(ChatFetchedState(texts));
           for (int i = 0; i < messages.length; i++) {
@@ -99,7 +98,7 @@ class ChatBloc extends Bloc<AppEvent, AppState> {
       store.close();
       message=message.trim();
       if(message!=""){
-        if(message.length<2){
+        if(message.length<=2){
           message+="  ";
         }
         SharedPreferences sharedPreferences= await SharedPreferences.getInstance();
@@ -112,10 +111,10 @@ class ChatBloc extends Bloc<AppEvent, AppState> {
         Store store= await openStore();
         final messages=store.box<MessageModel>();
         messages.put(MessageModel(contact,message,time,usr));
+        add(FetchChatEvent(contact));
         await backendService.sendMessage(contact, message);
         store.close();
         textControl.text="";
-        add(FetchChatEvent(contact));
       }
     },);
   }
