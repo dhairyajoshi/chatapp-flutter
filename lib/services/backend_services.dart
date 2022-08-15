@@ -1,12 +1,9 @@
-import 'package:chatapp/environment.dart';
-import 'package:chatapp/models/contact.dart';
-import 'package:chatapp/models/message.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:socket_io_client/socket_io_client.dart';
 import 'package:intl/intl.dart';
-import 'package:chatapp/objectbox.g.dart';
+import '../objectbox.g.dart';
 
 class BackendService {
   String baseUrl = 'https://whatsapp-backnd.herokuapp.com';

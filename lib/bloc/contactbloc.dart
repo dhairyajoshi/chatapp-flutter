@@ -1,8 +1,7 @@
-import 'package:chatapp/bloc/appbloc.dart';
-import 'package:chatapp/objectbox.g.dart';
-import 'package:chatapp/services/backend_services.dart';
+import '../bloc/appbloc.dart';
+import '../objectbox.g.dart';
+import '../services/backend_services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:objectbox/objectbox.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/contact.dart';
