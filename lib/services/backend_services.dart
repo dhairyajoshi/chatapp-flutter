@@ -1,3 +1,4 @@
+import 'package:contacts_service/contacts_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -78,6 +79,35 @@ class BackendService {
         final tdata=json.decode(response.body);
         
         for (int i = 0; i < tdata.length; i++) {
+          final Iterable<Contact> contacts = await ContactsService.getContacts();
+        for (int j = 0; j < contacts.length; j++) {
+            List phones=contacts.elementAt(j).phones!.toList();
+            if(phones.isEmpty) {
+              continue;
+            }
+            String contact = phones.first.value.toString();
+            if (contact == null) {
+              continue;
+            }
+
+            contact=contact.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '');
+            if(contact.length<10) {
+              continue;
+            }
+            
+            contact = contact
+                .split("")
+                .reversed
+                .join("")
+                .substring(0, 10)
+                .split("")
+                .reversed
+                .join("")
+                .toString();
+            if(contact==tdata[i]['phoneNo']) {
+              tdata[i]['name']=contacts.elementAt(j).displayName;
+            }
+          }
           data.add(tdata[i]);
         }
         return data;
