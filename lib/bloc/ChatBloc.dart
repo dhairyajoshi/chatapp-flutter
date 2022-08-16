@@ -72,6 +72,7 @@ class ChatBloc extends Bloc<AppEvent, AppState> {
           data.add(messages[i].toJson());
         }
         texts=data;
+        texts=List.from(texts.reversed);
         emit(ChatFetchedState(texts));
 
         List<Map<String, dynamic>> newdata =
@@ -79,6 +80,7 @@ class ChatBloc extends Bloc<AppEvent, AppState> {
 
         if (newdata.length > data.length) {
           texts=newdata;
+          texts=List.from(texts.reversed);
           emit(ChatFetchedState(texts));
           for (int i = 0; i < messages.length; i++) {
             messagebox.remove(messages[i].id);
@@ -89,7 +91,6 @@ class ChatBloc extends Bloc<AppEvent, AppState> {
           }
         }
 
-        scrlcont.jumpTo(scrlcont.position.maxScrollExtent);
         store.close();
       },
     );

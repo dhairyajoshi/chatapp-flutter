@@ -68,6 +68,7 @@ class ChatScreen extends StatelessWidget {
                                 EdgeInsets.only(top: 10, left: 5, right: 5),
                             color: Color.fromRGBO(10, 26, 35, 1),
                             child: ListView.builder(
+                              reverse: true,
                               controller: BlocProvider.of<ChatBloc>(context).scrlcont,
                               itemCount: state.data.length,
                               itemBuilder: (context, index) {

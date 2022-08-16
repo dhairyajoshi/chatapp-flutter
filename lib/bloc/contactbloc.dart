@@ -66,12 +66,20 @@ class ContactBloc extends Bloc<AppEvent, AppState> {
           List<String> chkcnt = [];
 
           for (int i = 0; i < contacts.length; i++) {
-            String contact = contacts
-                .elementAt(i)
-                .phones!
-                .first
-                .value!
-                .replaceAll(RegExp(r'[^a-zA-Z0-9]'), '');
+            List phones=contacts.elementAt(i).phones!.toList();
+            if(phones.isEmpty) {
+              continue;
+            }
+            String contact = phones.first.value.toString();
+            if (contact == null) {
+              continue;
+            }
+
+            contact=contact.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '');
+            if(contact.length<10) {
+              continue;
+            }
+            
             contact = contact
                 .split("")
                 .reversed
@@ -79,12 +87,14 @@ class ContactBloc extends Bloc<AppEvent, AppState> {
                 .substring(0, 10)
                 .split("")
                 .reversed
-                .join("").toString();
+                .join("")
+                .toString();
+            if(contact==usrph)
+            {continue;}
             chkcnt.add(contact);
           }
           List<Map<String, dynamic>> newdata =
               await backendService.getUsers(chkcnt);
-
 
           if (newdata != data) {
             contactlist = newdata;
